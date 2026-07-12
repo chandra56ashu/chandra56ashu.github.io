@@ -2,12 +2,12 @@ const portfolioModes = {
   data: {
     summary: "Data analyst with three years of experience delivering automation, dashboards and reliable data products—and an MSc specialism in business and supply chain analytics.",
     resumeText: "Download Data CV",
-    resumeHref: "assets/resumes/AshutoshChandra_Data_Analyst_Resume.docx"
+    resumeHref: "assets/AshutoshChandra_Data_Analyst_Resume.docx"
   },
   supply: {
     summary: "Analytics professional combining three years of high-volume data delivery with MSc research into supply chain complexity, analytics capability and GenAI decision support.",
     resumeText: "Download Supply Chain CV",
-    resumeHref: "assets/resumes/AshutoshChandra_Supply_Chain_Analyst_Resume.docx"
+    resumeHref: "assets/AshutoshChandra_Supply_Chain_Analyst_Resume.docx"
   }
 };
 
