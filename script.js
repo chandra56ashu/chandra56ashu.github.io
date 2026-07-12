@@ -1,19 +1,31 @@
+const DATA_CV_URL = "https://raw.githubusercontent.com/chandra56ashu/chandra56ashu.github.io/main/assets/AshutoshChandra_Data_Analyst_Resume.docx";
+const SUPPLY_CV_URL = "https://raw.githubusercontent.com/chandra56ashu/chandra56ashu.github.io/main/assets/AshutoshChandra_Supply_Chain_Analyst_Resume.docx";
+
 const portfolioModes = {
   data: {
     summary: "Data analyst with three years of experience delivering automation, dashboards and reliable data products—and an MSc specialism in business and supply chain analytics.",
     resumeText: "Download Data CV",
-    resumeHref: "assets/AshutoshChandra_Data_Analyst_Resume.docx"
+    resumeHref: DATA_CV_URL
   },
   supply: {
     summary: "Analytics professional combining three years of high-volume data delivery with MSc research into supply chain complexity, analytics capability and GenAI decision support.",
     resumeText: "Download Supply Chain CV",
-    resumeHref: "assets/AshutoshChandra_Supply_Chain_Analyst_Resume.docx"
+    resumeHref: SUPPLY_CV_URL
   }
 };
 
 const roleButtons = document.querySelectorAll(".role-button");
 const heroSummary = document.querySelector("#hero-summary");
 const resumeLink = document.querySelector(".resume-link");
+
+// Use direct GitHub file URLs for more reliable downloads across browsers.
+document.querySelectorAll('a[href*="AshutoshChandra_Data_Analyst_Resume.docx"]').forEach((link) => {
+  link.href = DATA_CV_URL;
+});
+
+document.querySelectorAll('a[href*="AshutoshChandra_Supply_Chain_Analyst_Resume.docx"]').forEach((link) => {
+  link.href = SUPPLY_CV_URL;
+});
 
 roleButtons.forEach((button) => {
   button.addEventListener("click", () => {
