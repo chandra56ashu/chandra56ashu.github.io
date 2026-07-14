@@ -1,0 +1,74 @@
+name: Patch portfolio source for unified CV
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update portfolio HTML
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+
+          html, summary_count = re.subn(
+              r'<p class="hero-lede" id="hero-summary">.*?</p>',
+              '<p class="hero-lede">Data and supply chain analyst with three years of experience delivering automation, dashboards and reliable data products—supported by an MSc in Business Data Analytics and industry research with A.P. Moller–Maersk.</p>',
+              html,
+              count=1,
+              flags=re.S,
+          )
+
+          html, selector_count = re.subn(
+              r'\n\s*<div class="role-switch".*?</div>\s*\n',
+              '\n',
+              html,
+              count=1,
+              flags=re.S,
+          )
+
+          html, hero_count = re.subn(
+              r'<a class="button secondary resume-link"[^>]*>.*?</a>',
+              '<a class="button secondary resume-link" href="assets/AshutoshChandra_CV.pdf" download>Download CV <span aria-hidden="true">↓</span></a>',
+              html,
+              count=1,
+              flags=re.S,
+          )
+
+          html, contact_count = re.subn(
+              r'<div class="cv-links">.*?</div>',
+              '<div class="cv-links"><a href="assets/AshutoshChandra_CV.pdf" download>Download CV ↓</a></div>',
+              html,
+              count=1,
+              flags=re.S,
+          )
+
+          if not all((summary_count, selector_count, hero_count, contact_count)):
+              raise SystemExit(
+                  f'Unexpected source layout: summary={summary_count}, selector={selector_count}, hero={hero_count}, contact={contact_count}'
+              )
+
+          path.write_text(html, encoding='utf-8')
+          PY
+
+      - name: Commit source update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "HTML is already up to date."
+            exit 0
+          fi
+          git commit -m "Remove role selector and use one PDF CV [skip ci]"
+          git push
