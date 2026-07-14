@@ -1,44 +1,30 @@
-const DATA_CV_URL = "https://raw.githubusercontent.com/chandra56ashu/chandra56ashu.github.io/main/assets/AshutoshChandra_Data_Analyst_Resume.docx";
-const SUPPLY_CV_URL = "https://raw.githubusercontent.com/chandra56ashu/chandra56ashu.github.io/main/assets/AshutoshChandra_Supply_Chain_Analyst_Resume.docx";
+const CV_URL = "assets/AshutoshChandra_CV.pdf";
+const UNIFIED_SUMMARY = "Data and supply chain analyst with three years of experience delivering automation, dashboards and reliable data products—supported by an MSc in Business Data Analytics and industry research with A.P. Moller–Maersk.";
 
-const portfolioModes = {
-  data: {
-    summary: "Data analyst with three years of experience delivering automation, dashboards and reliable data products—and an MSc specialism in business and supply chain analytics.",
-    resumeText: "Download Data CV",
-    resumeHref: DATA_CV_URL
-  },
-  supply: {
-    summary: "Analytics professional combining three years of high-volume data delivery with MSc research into supply chain complexity, analytics capability and GenAI decision support.",
-    resumeText: "Download Supply Chain CV",
-    resumeHref: SUPPLY_CV_URL
-  }
-};
+// Present one clear profile and one CV for both target roles.
+document.querySelector(".role-switch")?.remove();
 
-const roleButtons = document.querySelectorAll(".role-button");
 const heroSummary = document.querySelector("#hero-summary");
-const resumeLink = document.querySelector(".resume-link");
+if (heroSummary) {
+  heroSummary.textContent = UNIFIED_SUMMARY;
+}
 
-// Use direct GitHub file URLs for more reliable downloads across browsers.
-document.querySelectorAll('a[href*="AshutoshChandra_Data_Analyst_Resume.docx"]').forEach((link) => {
-  link.href = DATA_CV_URL;
-});
+const heroResumeLink = document.querySelector(".resume-link");
+if (heroResumeLink) {
+  heroResumeLink.href = CV_URL;
+  heroResumeLink.setAttribute("download", "AshutoshChandra_CV.pdf");
+  heroResumeLink.innerHTML = 'Download CV <span aria-hidden="true">↓</span>';
+}
 
-document.querySelectorAll('a[href*="AshutoshChandra_Supply_Chain_Analyst_Resume.docx"]').forEach((link) => {
-  link.href = SUPPLY_CV_URL;
-});
-
-roleButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const mode = portfolioModes[button.dataset.role];
-    roleButtons.forEach((item) => {
-      const isActive = item === button;
-      item.classList.toggle("active", isActive);
-      item.setAttribute("aria-pressed", String(isActive));
-    });
-    heroSummary.textContent = mode.summary;
-    resumeLink.firstChild.textContent = `${mode.resumeText} `;
-    resumeLink.href = mode.resumeHref;
-  });
+const contactCvLinks = document.querySelectorAll(".cv-links a");
+contactCvLinks.forEach((link, index) => {
+  if (index === 0) {
+    link.href = CV_URL;
+    link.setAttribute("download", "AshutoshChandra_CV.pdf");
+    link.textContent = "Download CV ↓";
+  } else {
+    link.remove();
+  }
 });
 
 const filterButtons = document.querySelectorAll(".filter-button");
@@ -62,17 +48,19 @@ filterButtons.forEach((button) => {
 const menuButton = document.querySelector(".menu-toggle");
 const primaryNav = document.querySelector("#primary-nav");
 
-menuButton.addEventListener("click", () => {
-  const isOpen = primaryNav.classList.toggle("open");
-  menuButton.setAttribute("aria-expanded", String(isOpen));
-});
-
-primaryNav.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    primaryNav.classList.remove("open");
-    menuButton.setAttribute("aria-expanded", "false");
+if (menuButton && primaryNav) {
+  menuButton.addEventListener("click", () => {
+    const isOpen = primaryNav.classList.toggle("open");
+    menuButton.setAttribute("aria-expanded", String(isOpen));
   });
-});
+
+  primaryNav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      primaryNav.classList.remove("open");
+      menuButton.setAttribute("aria-expanded", "false");
+    });
+  });
+}
 
 const revealItems = document.querySelectorAll(".reveal");
 
@@ -91,4 +79,7 @@ if ("IntersectionObserver" in window) {
   revealItems.forEach((item) => item.classList.add("visible"));
 }
 
-document.querySelector("#year").textContent = new Date().getFullYear();
+const year = document.querySelector("#year");
+if (year) {
+  year.textContent = new Date().getFullYear();
+}
