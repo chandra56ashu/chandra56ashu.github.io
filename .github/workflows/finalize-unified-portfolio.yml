@@ -1,0 +1,78 @@
+name: Finalize unified portfolio and CV
+
+on:
+  push:
+    paths:
+      - '.github/workflows/finalize-unified-portfolio.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Replace two-role controls with one unified profile
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          index_path = Path('index.html')
+          html = index_path.read_text(encoding='utf-8')
+
+          old_summary = '''        <p class="hero-lede" id="hero-summary">Data analyst with three years of experience delivering automation, dashboards and reliable data products—and an MSc specialism in business and supply chain analytics.</p>'''
+          new_summary = '''        <p class="hero-lede">Data and supply chain analyst with three years of experience delivering automation, dashboards and reliable data products—supported by an MSc in Business Data Analytics and industry research with A.P. Moller–Maersk.</p>'''
+          if old_summary not in html:
+              raise SystemExit('Expected hero summary was not found.')
+          html = html.replace(old_summary, new_summary, 1)
+
+          role_switch = '''
+          <div class="role-switch" role="group" aria-label="Choose portfolio focus">
+            <button class="role-button active" type="button" data-role="data" aria-pressed="true">Data Analytics</button>
+            <button class="role-button" type="button" data-role="supply" aria-pressed="false">Supply Chain Analytics</button>
+          </div>
+'''
+          if role_switch not in html:
+              raise SystemExit('Expected role selector was not found.')
+          html = html.replace(role_switch, '', 1)
+
+          old_hero_cv = '''          <a class="button secondary resume-link" href="assets/AshutoshChandra_Data_Analyst_Resume.docx" download>Download Data CV <span aria-hidden="true">↓</span></a>'''
+          new_hero_cv = '''          <a class="button secondary resume-link" href="assets/AshutoshChandra_CV.pdf" download>Download CV <span aria-hidden="true">↓</span></a>'''
+          if old_hero_cv not in html:
+              raise SystemExit('Expected hero CV link was not found.')
+          html = html.replace(old_hero_cv, new_hero_cv, 1)
+
+          old_contact_cvs = '''          <div class="cv-links"><a href="assets/AshutoshChandra_Data_Analyst_Resume.docx" download>Data Analyst CV ↓</a><a href="assets/AshutoshChandra_Supply_Chain_Analyst_Resume.docx" download>Supply Chain CV ↓</a></div>'''
+          new_contact_cv = '''          <div class="cv-links"><a href="assets/AshutoshChandra_CV.pdf" download>Download CV ↓</a></div>'''
+          if old_contact_cvs not in html:
+              raise SystemExit('Expected contact CV links were not found.')
+          html = html.replace(old_contact_cvs, new_contact_cv, 1)
+
+          index_path.write_text(html, encoding='utf-8')
+
+          script_path = Path('script.js')
+          script = script_path.read_text(encoding='utf-8')
+          marker = 'const filterButtons = document.querySelectorAll(".filter-button");'
+          if marker not in script:
+              raise SystemExit('Expected project-filter marker was not found in script.js.')
+          script_path.write_text(script[script.index(marker):], encoding='utf-8')
+          PY
+
+      - name: Remove superseded CVs and temporary build files
+        run: |
+          rm -f assets/AshutoshChandra_Data_Analyst_Resume.docx
+          rm -f assets/AshutoshChandra_Supply_Chain_Analyst_Resume.docx
+          rm -rf assets/cv-build assets/cv-source assets/cv-parts
+          rm -f .github/workflows/build-final-cv.yml
+          rm -f .github/workflows/finalize-unified-portfolio.yml
+
+      - name: Commit final portfolio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Use one unified Data and Supply Chain CV [skip ci]"
+          git push
